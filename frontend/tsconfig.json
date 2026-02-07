@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowJs": true,         // <-- permet d'exécuter tes fichiers .js
+    "checkJs": false,        // <-- optionnel, désactive les erreurs JS
+    "outDir": "dist",
+    "moduleResolution": "node"
+  },
+  "include": [
+    "tests/**/*.js",
+    "tests/**/*.ts",
+    "playwright.config.js"
+  ]
+}
