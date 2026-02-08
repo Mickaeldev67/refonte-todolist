@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../frontend')));
 
 app.get('/items', getItems);
-app.post('/items', addItem);
+app.post('/items', addItem(db));
 app.put('/items/:id', updateItem);
 app.delete('/items/:id', deleteItem);
 
