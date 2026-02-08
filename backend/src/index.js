@@ -10,7 +10,7 @@ const path = require('path');
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../frontend')));
 
-app.get('/items', getItems);
+app.get('/items', getItems(db));
 app.post('/items', addItem(db));
 app.put('/items/:id', updateItem);
 app.delete('/items/:id', deleteItem(db));

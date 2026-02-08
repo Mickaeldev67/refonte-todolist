@@ -1,6 +1,6 @@
-const db = require('../persistence');
-
-module.exports = async (req, res) => {
-    const items = await db.getItems();
-    res.send(items);
+module.exports = (db) => {
+    return async (req, res) => {
+        const items = await db.getItems();
+        res.send(items);
+    };
 };
