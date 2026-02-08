@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, '../../frontend')));
 app.get('/items', getItems);
 app.post('/items', addItem(db));
 app.put('/items/:id', updateItem);
-app.delete('/items/:id', deleteItem);
+app.delete('/items/:id', deleteItem(db));
 
 db.init().then(() => {
     app.listen(3000, () => console.log('Listening on port 3000'));
