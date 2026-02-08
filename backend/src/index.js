@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname, '../../frontend')));
 
 app.get('/items', getItems(db));
 app.post('/items', addItem(db));
-app.put('/items/:id', updateItem);
+app.put('/items/:id', updateItem(db));
 app.delete('/items/:id', deleteItem(db));
 
 db.init().then(() => {
