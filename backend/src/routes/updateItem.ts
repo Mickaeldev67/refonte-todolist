@@ -1,5 +1,5 @@
-module.exports = (db) => {
-    return async (req, res) => {
+module.exports = (db: any) => {
+    return async (req: any, res: any) => {
         await db.updateItem(req.params.id, {
             name: req.body.name,
             completed: req.body.completed,

@@ -1,3 +1,5 @@
+export {};
+
 const getItems = require('../../src/routes/getItems');
 const ITEMS = [{ id: 12345 }];
 

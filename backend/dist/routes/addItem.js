@@ -1,5 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const { v4: uuid } = require('uuid');
-
 module.exports = (db) => {
     return async (req, res) => {
         const item = {
@@ -7,7 +8,6 @@ module.exports = (db) => {
             name: req.body.name,
             completed: false,
         };
-
         db.storeItem(item);
         res.send(item);
     };
