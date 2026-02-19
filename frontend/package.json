@@ -2,7 +2,10 @@
   "name": "frontend",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build:app": "tsc -p tsconfig.app.json",
+    "typecheck:app": "tsc -p tsconfig.app.json --noEmit"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
