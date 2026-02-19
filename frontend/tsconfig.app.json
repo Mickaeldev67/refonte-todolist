@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "None",
+    "jsx": "react",
+    "strict": true,
+    "skipLibCheck": true,
+    "outFile": "js/app.js"
+  },
+  "include": ["js/app.tsx"]
+}
