@@ -1,6 +1,7 @@
 
 export {};
 
+import cors from 'cors';
 const express = require('express');
 const app = express();
 const db = require('./persistence');
@@ -9,6 +10,10 @@ const addItem = require('./routes/addItem');
 const updateItem = require('./routes/updateItem');
 const deleteItem = require('./routes/deleteItem');
 const path = require('path');
+
+app.use(cors({
+  origin: 'http://localhost:5173' // ou '*' pour autoriser tout
+}));
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../frontend')));
