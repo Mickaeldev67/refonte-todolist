@@ -9,7 +9,8 @@
     "dev": "nodemon --watch src --ext ts --exec tsx src/index.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "depcruise": "depcruise --config dependency-cruiser.config.js src"
   },
   "dependencies": {
     "cors": "^2.8.6",
@@ -37,6 +38,7 @@
     "@types/node": "^25.3.0",
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",
+    "dependency-cruiser": "^17.3.8",
     "eslint": "^10.0.0",
     "globals": "^17.3.0",
     "jest": "^30.2.0",
