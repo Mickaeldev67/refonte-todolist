@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
+    "jsx": "react-jsx",
     "target": "ESNext",
-    "module": "CommonJS",
+    "module": "esnext",
+    "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
     "allowJs": true,         // <-- permet d'exécuter tes fichiers .js
     "checkJs": false,        // <-- optionnel, désactive les erreurs JS
-    "outDir": "dist",
     "moduleResolution": "node"
   },
   "include": [
+    "js/**/*",
     "tests/**/*.js",
     "tests/**/*.ts",
     "playwright.config.js"

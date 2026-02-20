@@ -1,15 +1,10 @@
-declare const React: any;
-declare const ReactDOM: any;
-declare const ReactBootstrap: any;
+import React, { useState, useEffect, useCallback, Fragment } from "react";
+import ReactDOM from "react-dom/client";
+import { Container, Row, Col, Form, InputGroup, Button } from "react-bootstrap";
 
-declare namespace JSX {
-  interface IntrinsicElements {
-    [elemName: string]: any;
-  }
-}
+const API_BASE = "http://localhost:3000";
 
 function App() {
-    const { Container, Row, Col } = ReactBootstrap;
     return (
         <Container>
             <Row>
@@ -22,10 +17,10 @@ function App() {
 }
 
 function TodoListCard() {
-    const [items, setItems] = React.useState(null);
+    const [items, setItems] = React.useState<any[]>([]);
 
     React.useEffect(() => {
-        fetch('/items')
+        fetch(`${API_BASE}/items`)
             .then(r => r.json())
             .then(setItems);
     }, []);
@@ -78,15 +73,13 @@ function TodoListCard() {
 }
 
 function AddItemForm({ onNewItem }: { onNewItem: (item: any) => void }) {
-    const { Form, InputGroup, Button } = ReactBootstrap;
-
     const [newItem, setNewItem] = React.useState('');
     const [submitting, setSubmitting] = React.useState(false);
 
     const submitNewItem = (e: any) => {
         e.preventDefault();
         setSubmitting(true);
-        fetch('/items', {
+        fetch(`${API_BASE}/items`, {
             method: 'POST',
             body: JSON.stringify({ name: newItem }),
             headers: { 'Content-Type': 'application/json' },
@@ -109,26 +102,21 @@ function AddItemForm({ onNewItem }: { onNewItem: (item: any) => void }) {
                     placeholder="New Item"
                     aria-describedby="basic-addon1"
                 />
-                <InputGroup.Append>
-                    <Button
-                        type="submit"
-                        variant="success"
-                        disabled={!newItem.length}
-                        className={submitting ? 'disabled' : ''}
-                    >
-                        {submitting ? 'Adding...' : 'Add Item'}
-                    </Button>
-                </InputGroup.Append>
+                <Button
+                    type="submit"
+                    variant="success"
+                    disabled={!newItem.length || submitting}
+                >
+                    {submitting ? "Adding..." : "Add Item"}
+                </Button>
             </InputGroup>
         </Form>
     );
 }
 
 function ItemDisplay({ item, onItemUpdate, onItemRemoval }: any) {
-    const { Container, Row, Col, Button } = ReactBootstrap;
-
     const toggleCompletion = () => {
-        fetch(`/items/${item.id}`, {
+        fetch(`${API_BASE}/items/${item.id}`, {
             method: 'PUT',
             body: JSON.stringify({
                 name: item.name,
@@ -141,7 +129,7 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }: any) {
     };
 
     const removeItem = () => {
-        fetch(`/items/${item.id}`, { method: 'DELETE' }).then(() =>
+        fetch(`${API_BASE}/items/${item.id}`, { method: 'DELETE' }).then(() =>
             onItemRemoval(item),
         );
     };
@@ -186,4 +174,5 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }: any) {
     );
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+root.render(<App />);

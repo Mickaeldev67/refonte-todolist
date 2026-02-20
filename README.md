@@ -13,3 +13,6 @@ nvm use 24.13.1
 1. Lancer npm start
 ## frontend : Lancer vite 
 npx vite
+
+## Séparation devdependancies de dependancies 
+Tout était fait automatiquement 
