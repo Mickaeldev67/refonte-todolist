@@ -7,3 +7,9 @@ The application is based on the application from the getting started tutorial at
 # Mise à jour version de node LTS 
 nvm install --LTS 
 nvm use 24.13.1
+
+# Lancer le projet
+## backend : 
+1. Lancer npm start
+## frontend : Lancer vite 
+npx vite
