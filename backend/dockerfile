@@ -1,0 +1,16 @@
+# On prend Node 24.13.1
+FROM node:24.13.1
+WORKDIR /app
+
+# Copier package.json et installer les dépendances
+COPY package*.json ./
+RUN npm install
+
+# Copier tout le code source
+COPY . .
+
+# Exposer le port du backend
+EXPOSE 3000
+
+# Démarrage en mode dev avec nodemon ou ts-node-dev
+CMD ["sh", "-c", "npm run build && npm start"]

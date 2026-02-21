@@ -9,10 +9,8 @@ nvm install --LTS
 nvm use 24.13.1
 
 # Lancer le projet
-## backend : 
-1. Lancer npm start
-## frontend : Lancer vite 
-npx vite
+Lancer : 
+docker-compose up --build
 
 ## Séparation devdependancies de dependancies 
 Tout était fait automatiquement 

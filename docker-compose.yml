@@ -1,0 +1,42 @@
+services:
+  backend:
+    build: ./backend
+    container_name: todolist-backend
+    ports:
+      - "3000:3000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpassword
+      MYSQL_DB: tododb
+    depends_on:
+      - mysql
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build: ./frontend
+    container_name: todolist-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: "http://localhost:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  mysql:
+    image: mysql:8
+    container_name: todolist-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tododb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:

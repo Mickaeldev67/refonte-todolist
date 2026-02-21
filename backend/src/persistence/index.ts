@@ -8,7 +8,6 @@ export async function createRepository(): Promise<ItemRepository> {
 
   if (process.env.MYSQL_HOST) {
     repository = new MysqlRepository();
-    throw new Error('MysqlRepository not implemented yet');
   } else {
     repository = new SqliteRepository();
   }
