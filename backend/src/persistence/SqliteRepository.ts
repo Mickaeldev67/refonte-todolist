@@ -26,7 +26,7 @@ export class SqliteRepository implements ItemRepository {
     });
   }
 
-  async getAll(): Promise<Item[]> {
+  async getItems(): Promise<Item[]> {
     return new Promise((resolve, reject) => {
       this.db.all('SELECT * FROM todo_items', (err, rows: any[]) => {
         if (err) return reject(err);
@@ -42,7 +42,7 @@ export class SqliteRepository implements ItemRepository {
     });
   }
 
-  async getById(id: string): Promise<Item | undefined> {
+  async getItem(id: string): Promise<Item | undefined> {
     return new Promise((resolve, reject) => {
       this.db.get(
         'SELECT * FROM todo_items WHERE id=?',
@@ -61,7 +61,7 @@ export class SqliteRepository implements ItemRepository {
     });
   }
 
-  async add(item: Item): Promise<void> {
+  async storeItem(item: Item): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(
         'INSERT INTO todo_items (id, name, completed) VALUES (?, ?, ?)',
@@ -71,7 +71,7 @@ export class SqliteRepository implements ItemRepository {
     });
   }
 
-  async update(id: string, item: Item): Promise<void> {
+  async updateItem(id: string, item: Item): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(
         'UPDATE todo_items SET name=?, completed=? WHERE id=?',
@@ -81,7 +81,7 @@ export class SqliteRepository implements ItemRepository {
     });
   }
 
-  async delete(id: string): Promise<void> {
+  async removeItem(id: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.run(
         'DELETE FROM todo_items WHERE id=?',
