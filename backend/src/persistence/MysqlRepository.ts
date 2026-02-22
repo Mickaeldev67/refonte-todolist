@@ -31,15 +31,29 @@ export class MysqlRepository implements ItemRepository {
     // Création de la table si elle n'existe pas
     await new Promise<void>((resolve, reject) => {
       this.pool.query(
-        'CREATE TABLE IF NOT EXISTS todo_items (id varchar(36), name varchar(255), completed boolean) DEFAULT CHARSET utf8mb4',
+        `CREATE TABLE IF NOT EXISTS users (
+          id varchar(36) PRIMARY KEY,
+          username varchar(255) UNIQUE NOT NULL,
+          password_hash varchar(255) NOT NULL
+        ) DEFAULT CHARSET utf8mb4`,
+        (err) => (err ? reject(err) : resolve())
+      );
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      this.pool.query(
+        'CREATE TABLE IF NOT EXISTS todo_items (id varchar(36), name varchar(255), completed boolean, user_id varchar(36) NOT NULL, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE) DEFAULT CHARSET utf8mb4',
         (err) => (err ? reject(err) : resolve())
       );
     });
   }
 
-  async getItems(): Promise<Item[]> {
-    return new Promise((resolve, reject) => {
-      this.pool.query('SELECT * FROM todo_items', (err, rows: any[]) => {
+  async getItems(userId: string): Promise<Item[]> {
+  return new Promise((resolve, reject) => {
+    this.pool.query(
+      'SELECT * FROM todo_items WHERE user_id=?',
+      [userId],
+      (err, rows: any[]) => {
         if (err) return reject(err);
         resolve(
           rows.map(row => ({
@@ -48,50 +62,90 @@ export class MysqlRepository implements ItemRepository {
             completed: row.completed === 1,
           }))
         );
-      });
-    });
-  }
+      }
+    );
+  });
+}
 
-  async getItem(id: string): Promise<Item | undefined> {
-    return new Promise((resolve, reject) => {
-      this.pool.query('SELECT * FROM todo_items WHERE id=?', [id], (err, rows: any[]) => {
+  async getItem(id: string, userId: string): Promise<Item | undefined> {
+  return new Promise((resolve, reject) => {
+    this.pool.query(
+      'SELECT * FROM todo_items WHERE id=? AND user_id=?',
+      [id, userId],
+      (err, rows: any[]) => {
         if (err) return reject(err);
         const row = rows[0];
         if (!row) return resolve(undefined);
+
         resolve({
           id: row.id,
           name: row.name,
           completed: row.completed === 1,
         });
-      });
-    });
-  }
+      }
+    );
+  });
+}
 
-  async storeItem(item: Item): Promise<void> {
+  async storeItem(item: Item, userId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    this.pool.query(
+      'INSERT INTO todo_items (id, user_id, name, completed) VALUES (?, ?, ?, ?)',
+      [item.id, userId, item.name, item.completed ? 1 : 0],
+      (err) => (err ? reject(err) : resolve())
+    );
+  });
+}
+
+  async updateItem(id: string, item: Item, userId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    this.pool.query(
+      'UPDATE todo_items SET name=?, completed=? WHERE id=? AND user_id=?',
+      [item.name, item.completed ? 1 : 0, id, userId],
+      (err) => (err ? reject(err) : resolve())
+    );
+  });
+}
+
+  async createUser(user: { id: string; username: string; passwordHash: string }): Promise<void> {
     return new Promise((resolve, reject) => {
       this.pool.query(
-        'INSERT INTO todo_items (id, name, completed) VALUES (?, ?, ?)',
-        [item.id, item.name, item.completed ? 1 : 0],
+        'INSERT INTO users (id, username, password_hash) VALUES (?, ?, ?)',
+        [user.id, user.username, user.passwordHash],
         (err) => (err ? reject(err) : resolve())
       );
     });
   }
 
-  async updateItem(id: string, item: Item): Promise<void> {
+  async getUserByUsername(username: string): Promise<{ id: string; username: string; passwordHash: string } | undefined> {
     return new Promise((resolve, reject) => {
       this.pool.query(
-        'UPDATE todo_items SET name=?, completed=? WHERE id=?',
-        [item.name, item.completed ? 1 : 0, id],
-        (err) => (err ? reject(err) : resolve())
+        'SELECT * FROM users WHERE username=?',
+        [username],
+        (err, rows: any[]) => {
+          if (err) return reject(err);
+          const row = rows[0];
+          if (!row) return resolve(undefined);
+
+          resolve({
+            id: row.id,
+            username: row.username,
+            passwordHash: row.password_hash,
+          });
+        }
       );
     });
   }
 
-  async removeItem(id: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.pool.query('DELETE FROM todo_items WHERE id=?', [id], (err) => (err ? reject(err) : resolve()));
-    });
-  }
+  async removeItem(id: string, userId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    this.pool.query(
+      'DELETE FROM todo_items WHERE id=? AND user_id=?',
+      [id, userId],
+      (err) => (err ? reject(err) : resolve())
+    );
+  });
+}
 
   async teardown(): Promise<void> {
     return new Promise((resolve, reject) => {

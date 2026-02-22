@@ -2,15 +2,23 @@
 FROM node:24.13.1
 WORKDIR /app
 
-# Copier package.json et installer les dépendances
-COPY package*.json ./
-RUN npm install
+# Installer les dépendances de compilation pour les modules natifs
+# RUN apt-get update && apt-get install -y python3 build-essential && rm -rf /var/lib/apt/lists/*
+
+# Copier package.json et package-lock.json
+COPY package.json package-lock.json ./
+
+# Installer les dépendances (y compris devDependencies pour la compilation TypeScript)
+RUN npm ci
 
 # Copier tout le code source
 COPY . .
 
+# Compiler TypeScript et afficher les erreurs
+RUN npm run build && ls -la dist/
+
 # Exposer le port du backend
 EXPOSE 3000
 
-# Démarrage en mode dev avec nodemon ou ts-node-dev
-CMD ["sh", "-c", "npm run build && npm start"]
+# Démarrage du serveur
+CMD ["npm", "start"]

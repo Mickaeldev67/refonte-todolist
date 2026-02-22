@@ -20,7 +20,13 @@ export class SqliteRepository implements ItemRepository {
 
         this.db.run(
           'CREATE TABLE IF NOT EXISTS todo_items (id varchar(36), name varchar(255), completed boolean)',
-          (err) => (err ? reject(err) : resolve())
+          (err) => {
+            if (err) return reject(err);
+            this.db.run(
+              'CREATE TABLE IF NOT EXISTS users (id varchar(36) PRIMARY KEY, username varchar(255) UNIQUE NOT NULL, password_hash varchar(255) NOT NULL)',
+              (err) => (err ? reject(err) : resolve())
+            );
+          }
         );
       });
     });
@@ -86,6 +92,35 @@ export class SqliteRepository implements ItemRepository {
       this.db.run(
         'DELETE FROM todo_items WHERE id=?',
         [id],
+        (err) => (err ? reject(err) : resolve())
+      );
+    });
+  }
+
+  async getUserByUsername(username: string): Promise<{ id: string; username: string; passwordHash: string } | undefined> {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT * FROM users WHERE username=?',
+        [username],
+        (err, row: any) => {
+          if (err) return reject(err);
+          if (!row) return resolve(undefined);
+
+          resolve({
+            id: row.id,
+            username: row.username,
+            passwordHash: row.password_hash,
+          });
+        }
+      );
+    });
+  }
+
+  async createUser(user: { id: string; username: string; passwordHash: string }): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'INSERT INTO users (id, username, password_hash) VALUES (?, ?, ?)',
+        [user.id, user.username, user.passwordHash],
         (err) => (err ? reject(err) : resolve())
       );
     });

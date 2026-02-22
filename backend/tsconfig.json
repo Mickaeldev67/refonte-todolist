@@ -9,6 +9,6 @@
     "skipLibCheck": true,
     "types": ["node", "jest"]
   },
-  "include": ["src"],
+  "include": ["src", "todelete/sqlite.ts", "todelete/mysql.ts"],
   "exclude": ["node_modules", "dist","spec"]
 }

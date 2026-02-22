@@ -1,6 +1,8 @@
 module.exports = (db: any) => {
     return async (req: any, res: any) => {
-        await db.removeItem(req.params.id);
+        const userId = req.session.userId;
+        await db.removeItem(req.params.id, userId);
+
         res.sendStatus(200);
     };
 };
