@@ -2,6 +2,7 @@ services:
   backend:
     build: ./backend
     container_name: todolist-backend
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
@@ -10,10 +11,12 @@ services:
       MYSQL_PASSWORD: rootpassword
       MYSQL_DB: tododb
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - /app/dist
 
   frontend:
     build: ./frontend
@@ -37,6 +40,11 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   mysql-data:
