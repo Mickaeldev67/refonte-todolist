@@ -1,16 +1,84 @@
-# Getting started
+# Refonte – Getting Started Application
 
-This repository is a sample application for users following the getting started guide at https://docs.docker.com/get-started/.
+Ce projet est une refonte de l'application  :
+https://github.com/docker/getting-started
 
-The application is based on the application from the getting started tutorial at https://github.com/docker/getting-started
+La refonte apporte :
 
-# Mise à jour version de node LTS 
-nvm install --LTS 
+- Séparation du back-end et du front-end
+- Migration du backend vers Node.js (upgrade de la version utilisée) + TypeScript
+- Migration de SQLite vers MySQL
+- Mise en place d’une authentification utilisateur (session + bcrypt)
+- Architecture multi-conteneurs via Docker Compose
+- Tests end-to-end avec Playwright
+
+---
+
+# 🧱 Architecture
+
+L’application est composée de trois services Docker :
+
+- **backend** : API Node.js / Express (port 3000)
+- **frontend** : Application TypeScript (port 5173)
+- **mysql** : Base de données MySQL 8
+
+Les données MySQL sont persistées via le volume Docker :
+mysql-data
+
+
+---
+
+# ⚙️ Prérequis
+
+- Docker
+- Docker Compose
+
+Node.js est requis uniquement si exécution hors Docker.
+
+---
+
+# 🔄 Version Node (hors Docker uniquement)
+
+Si vous lancez le projet localement sans Docker :
+
+
+nvm install --lts
+
 nvm use 24.13.1
 
-# Lancer le projet
-Lancer : 
+---
+
+# 🚀 Lancer le projet en développement
+
+Lancer, à la raçine du projet : 
 docker-compose up --build
 
-## Séparation devdependancies de dependancies 
+Accès aux services :
+
+   Frontend : http://localhost:5173
+
+   Backend API : http://localhost:3000
+
+   MySQL : localhost:3306
+
+---
+
+# 📦 Gestion des dépendances
+
+Les dépendances sont séparées entre :
+
+dependencies : nécessaires à l’exécution
+
+devDependencies : outils de développement, build et tests
+
 Tout était fait automatiquement 
+
+
+# 📚 Architecture Decision Records (ADR)
+
+Les décisions d’architecture sont documentées dans le dossier `/adr`.
+
+- ADR-001 : Choix du SGBD
+- ADR-002 : Choix du mécanisme de hachage
+- ADR-003 : Choix du mécanisme d’authentification
+- ADR-004 : Choix de l’outil de tests E2E
