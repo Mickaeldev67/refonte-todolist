@@ -9,7 +9,8 @@ test('it stores item correctly', async () => {
     };
     const id = 'something-not-a-uuid';
     const name = 'A sample item';
-    const req = { body: { name } };
+    const userId = 'user-123';
+    const req = { body: { name }, session: { userId } };
     const res = { send: jest.fn() };
     
 
@@ -23,6 +24,7 @@ test('it stores item correctly', async () => {
 
     expect(fakeDb.storeItem.mock.calls.length).toBe(1);
     expect(fakeDb.storeItem.mock.calls[0][0]).toEqual(expectedItem);
+    expect(fakeDb.storeItem.mock.calls[0][1]).toEqual(userId);
     expect(res.send.mock.calls[0].length).toBe(1);
     expect(res.send.mock.calls[0][0]).toEqual(expectedItem);
 });

@@ -7,7 +7,8 @@ test('it gets items correctly', async () => {
     const fakeDb = {
         getItems: jest.fn().mockResolvedValue(ITEMS),
     };
-    const req = {};
+    const userId = 'user-123';
+    const req = { session: { userId } };
     const res = { send: jest.fn() };
     
     const handler = getItems(fakeDb);
@@ -15,6 +16,7 @@ test('it gets items correctly', async () => {
 
 
     expect(fakeDb.getItems.mock.calls.length).toBe(1);
+    expect(fakeDb.getItems.mock.calls[0][0]).toEqual(userId);
     expect(res.send.mock.calls[0].length).toBe(1);
     expect(res.send.mock.calls[0][0]).toEqual(ITEMS);
 });
