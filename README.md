@@ -47,6 +47,15 @@ nvm install --lts
 nvm use 24.13.1
 
 ---
+# Pour les développeurs 
+
+Lancer les tests backend, dans le dossier backend ouvrir un terminal et tapez : 
+
+npm run test 
+
+Lancer les tests frontend, dans le dossier frontend ouvrir un terminal et tapez : 
+
+npx npx playwright test
 
 # 🚀 Lancer le projet en développement
 
