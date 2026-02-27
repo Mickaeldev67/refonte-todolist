@@ -55,7 +55,7 @@ npm run test
 
 Lancer les tests frontend, dans le dossier frontend ouvrir un terminal et tapez : 
 
-npx npx playwright test
+npx playwright test
 
 # 🚀 Lancer le projet en développement
 
