@@ -26,7 +26,7 @@ Le reverse proxy permet :
 
 ## 2. Prérequis serveur
 
-- Serveur Linux (Ubuntu recommandé)
+- Serveur Linux 
 - Docker
 - Docker Compose
 - Nom de domaine configuré

@@ -18,7 +18,7 @@ function App() {
 
     const logout = async () => {
         try {
-            await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
+            await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
         } catch (err) {
             console.error(err);
         } finally {
@@ -53,7 +53,7 @@ function App() {
         <Container>
             <Row>
                 <Col md={{ offset: 3, span: 6 }}>
-                    <Button onClick={logout} className="mb-3">Logout</Button>
+                    <Button onClick={logout} className="mb-3">Logout hhh</Button>
                     <TodoListCard />
                 </Col>
             </Row>
@@ -70,7 +70,7 @@ function RegisterForm({ onRegister }: { onRegister: () => void }) {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const res = await fetch(`${API_BASE}/register`, {
+            const res = await fetch(`${API_BASE}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
@@ -117,7 +117,7 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const res = await fetch(`${API_BASE}/login`, {
+            const res = await fetch(`${API_BASE}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
@@ -164,7 +164,7 @@ function TodoListCard() {
 
     const fetchItems = async () => {
         try {
-            const res = await fetch(`${API_BASE}/items`, { credentials: 'include' });
+            const res = await fetch(`${API_BASE}/tasks`, { credentials: 'include' });
             const data = await res.json();
             setItems(data);
         } catch (err) {
@@ -203,16 +203,17 @@ function TodoListCard() {
 function AddItemForm({ onNewItem }: { onNewItem: (item: any) => void }) {
     const [newItem, setNewItem] = useState('');
     const [submitting, setSubmitting] = useState(false);
-
+    console.log(newItem)
     const submitNewItem = async (e: any) => {
         e.preventDefault();
+
         if (!newItem) return;
         setSubmitting(true);
         try {
-            const res = await fetch(`${API_BASE}/items`, {
+            const res = await fetch(`${API_BASE}/tasks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newItem }),
+                body: JSON.stringify({ name: newItem, projectId: "default-project" }),
                 credentials: 'include',
             });
             const item = await res.json();
@@ -246,10 +247,10 @@ function AddItemForm({ onNewItem }: { onNewItem: (item: any) => void }) {
 function ItemDisplay({ item, onItemUpdate, onItemRemoval }: any) {
     const toggleCompletion = async () => {
         try {
-            const res = await fetch(`${API_BASE}/items/${item.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: item.name, completed: !item.completed }),
+            const res = await fetch(`${API_BASE}/tasks/${item.id}/close`, {
+                method: 'POST',
+                //headers: { 'Content-Type': 'application/json' },
+                //body: JSON.stringify({ name: item.name, completed: !item.completed }),
                 credentials: 'include',
             });
             const updated = await res.json();
@@ -261,7 +262,7 @@ function ItemDisplay({ item, onItemUpdate, onItemRemoval }: any) {
 
     const removeItem = async () => {
         try {
-            await fetch(`${API_BASE}/items/${item.id}`, { method: 'DELETE', credentials: 'include' });
+            await fetch(`${API_BASE}/tasks/${item.id}`, { method: 'DELETE', credentials: 'include' });
             onItemRemoval(item);
         } catch (err) {
             console.error(err);
