@@ -1,10 +1,28 @@
-/backend/node_modules
-/backend/dist
+# Node dependencies (tous les services backend + gateway)
+**/node_modules
 
-# Playwright
-/frontend/node_modules/
-/frontend/test-results/
-/frontend/playwright-report/
-/frontend/blob-report/
-/frontend/playwright/.cache/
-/frontend/playwright/.auth/
+# Build TypeScript
+**/dist
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
+# ===== FRONTEND  =====
+frontend/node_modules/
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/playwright/.cache/
+frontend/playwright/.auth/

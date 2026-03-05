@@ -1,22 +1,61 @@
 services:
-  backend:
-    build: ./backend
-    container_name: todolist-backend
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
+  mysql:
+    image: mysql:8.4
     environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  auth:
+    build: ./services/auth
+    environment:
+      PORT: 3001
       MYSQL_HOST: mysql
       MYSQL_USER: root
-      MYSQL_PASSWORD: rootpassword
-      MYSQL_DB: tododb
+      MYSQL_PASSWORD: root
+      MYSQL_DB: auth_db
     depends_on:
-      mysql:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-      - /app/dist
+      - mysql
+    ports:
+      - "3001:3001"
+
+  tasks:
+    build: ./services/tasks
+    environment:
+      PORT: 3002
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DB: task_db
+      RABBIT_URL: amqp://rabbitmq:5672
+      RABBIT_EXCHANGE: domain-events
+    depends_on:
+      - mysql
+      - rabbitmq
+    ports:
+      - "3002:3002"
+
+  gateway:
+    build: ./gateway
+    environment:
+      PORT: 3000
+      AUTH_URL: http://auth:3001
+      TASKS_URL: http://tasks:3002
+      SESSION_SECRET: change-me
+    depends_on:
+      - auth
+      - tasks
+    ports:
+      - "3000:3000"
 
   frontend:
     build: ./frontend
@@ -29,22 +68,5 @@ services:
       - ./frontend:/app
       - /app/node_modules
 
-  mysql:
-    image: mysql:8
-    container_name: todolist-mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: tododb
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
 volumes:
-  mysql-data:
+  mysql_data:
