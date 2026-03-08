@@ -10,6 +10,7 @@ declare module "express-session" {
 
 const AUTH_URL = process.env.AUTH_URL || "http://auth:3001";
 const TASKS_URL = process.env.TASKS_URL || "http://tasks:3002";
+const PROJECTS_URL = process.env.PROJECTS_URL || "http://projects:3003";
 
 const app = express();
 app.use(express.json());
@@ -90,6 +91,62 @@ app.delete("/tasks/:id", requireAuth, async (req, res) => {
     method: "DELETE",
     headers: { "X-User-Id": req.session.userId! },
   });
+  res.status(r.status).json(await r.json());
+});
+
+app.get("/projects", requireAuth, async (req, res) => {
+  const r = await fetch(`${PROJECTS_URL}/projects`, {
+    headers: { "X-User-Id": req.session.userId! },
+  });
+  res.status(r.status).json(await r.json());
+});
+
+app.post("/projects", requireAuth, async (req, res) => {
+  const r = await fetch(`${PROJECTS_URL}/projects`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-User-Id": req.session.userId!,
+    },
+    body: JSON.stringify(req.body),
+  });
+  res.status(r.status).json(await r.json());
+});
+
+app.patch("/projects/:id", requireAuth, async (req, res) => {
+  const r = await fetch(`${PROJECTS_URL}/projects/${req.params.id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "X-User-Id": req.session.userId!,
+    },
+    body: JSON.stringify(req.body),
+  });
+  res.status(r.status).json(await r.json());
+});
+
+app.post("/projects/:id/close", requireAuth, async (req, res) => {
+  const r = await fetch(`${PROJECTS_URL}/projects/${req.params.id}/close`, {
+    method: "POST",
+    headers: { "X-User-Id": req.session.userId! },
+  });
+  res.status(r.status).json(await r.json());
+});
+
+app.delete("/projects/:id", requireAuth, async (req, res) => {
+  const r = await fetch(`${PROJECTS_URL}/projects/${req.params.id}`, {
+    method: "DELETE",
+    headers: { "X-User-Id": req.session.userId! },
+  });
+  res.status(r.status).json(await r.json());
+});
+
+app.post("/tasks/:id/reopen", requireAuth, async (req, res) => {
+  const r = await fetch(`${TASKS_URL}/tasks/${req.params.id}/reopen`, {
+    method: "POST",
+    headers: { "X-User-Id": req.session.userId! },
+  });
+
   res.status(r.status).json(await r.json());
 });
 

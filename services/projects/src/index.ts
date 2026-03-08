@@ -1,10 +1,10 @@
-import { MysqlTaskRepository } from "./infrastructure/db/MysqlTaskRepository";
+import { MysqlProjectRepository } from "./infrastructure/db/MysqlProjectRepository";
 import { RabbitPublisher } from "./infrastructure/messaging/RabbitPublisher";
 import { RabbitConsumer } from "./infrastructure/messaging/RabbitConsumer";
-import { startTaskServer } from "./infrastructure/http/server";
+import { startProjectServer } from "./infrastructure/http/server";
 
 async function main() {
-  const repo = new MysqlTaskRepository();
+  const repo = new MysqlProjectRepository();
   await repo.init();
 
   const publisher = new RabbitPublisher();
@@ -13,7 +13,7 @@ async function main() {
   const consumer = new RabbitConsumer(repo);
   await consumer.init();
 
-  startTaskServer(repo, publisher, Number(process.env.PORT || 3002));
+  startProjectServer(repo, publisher, Number(process.env.PORT || 3003));
 }
 
 main().catch((e) => {
