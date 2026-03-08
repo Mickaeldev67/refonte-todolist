@@ -19,11 +19,19 @@ export class MysqlTaskRepository implements TaskRepository {
   async getTasks(userId: string): Promise<Task[]> {
     return new Promise((resolve, reject) => {
       this.pool.query(
-        "SELECT id, name, completed, project_id FROM tasks WHERE user_id=?",
+        "SELECT id, name, status, project_id FROM tasks WHERE user_id=?",
         [userId],
         (err, rows: any[]) => {
           if (err) return reject(err);
-          resolve(rows.map((r) => ({ id: r.id, name: r.name, completed: r.completed === 1, projectId: r.project_id })));
+
+          resolve(
+            rows.map((r) => ({
+              id: r.id,
+              name: r.name,
+              status: r.status,
+              projectId: r.project_id,
+            }))
+          );
         }
       );
     });
@@ -32,13 +40,20 @@ export class MysqlTaskRepository implements TaskRepository {
   async getTask(id: string, userId: string): Promise<Task | undefined> {
     return new Promise((resolve, reject) => {
       this.pool.query(
-        "SELECT id, name, completed, project_id FROM tasks WHERE id=? AND user_id=?",
+        "SELECT id, name, status, project_id FROM tasks WHERE id=? AND user_id=?",
         [id, userId],
         (err, rows: any[]) => {
           if (err) return reject(err);
+
           const r = rows[0];
           if (!r) return resolve(undefined);
-          resolve({ id: r.id, name: r.name, completed: r.completed === 1, projectId: r.project_id });
+
+          resolve({
+            id: r.id,
+            name: r.name,
+            status: r.status,
+            projectId: r.project_id,
+          });
         }
       );
     });
@@ -47,8 +62,8 @@ export class MysqlTaskRepository implements TaskRepository {
   async storeTask(task: Task, userId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.pool.query(
-        "INSERT INTO tasks (id, user_id, project_id, name, completed) VALUES (?, ?, ?, ?, ?)",
-        [task.id, userId, task.projectId, task.name, task.completed ? 1 : 0],
+        "INSERT INTO tasks (id, user_id, project_id, name, status) VALUES (?, ?, ?, ?, ?)",
+        [task.id, userId, task.projectId, task.name, task.status],
         (err) => (err ? reject(err) : resolve())
       );
     });
@@ -57,8 +72,8 @@ export class MysqlTaskRepository implements TaskRepository {
   async updateTask(id: string, task: Task, userId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.pool.query(
-        "UPDATE tasks SET name=?, completed=?, project_id=? WHERE id=? AND user_id=?",
-        [task.name, task.completed ? 1 : 0, task.projectId, id, userId],
+        "UPDATE tasks SET name=?, status=?, project_id=? WHERE id=? AND user_id=?",
+        [task.name, task.status, task.projectId, id, userId],
         (err) => (err ? reject(err) : resolve())
       );
     });
@@ -66,11 +81,46 @@ export class MysqlTaskRepository implements TaskRepository {
 
   async removeTask(id: string, userId: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.pool.query("DELETE FROM tasks WHERE id=? AND user_id=?", [id, userId], (err) => (err ? reject(err) : resolve()));
+      this.pool.query(
+        "DELETE FROM tasks WHERE id=? AND user_id=?",
+        [id, userId],
+        (err) => (err ? reject(err) : resolve())
+      );
+    });
+  }
+
+    async getProjectStatus(projectId: string): Promise<"OPEN" | "CLOSED" | undefined> {
+    return new Promise((resolve, reject) => {
+      this.pool.query(
+        "SELECT status FROM project_status_view WHERE project_id=?",
+        [projectId],
+        (err, rows: any[]) => {
+          if (err) return reject(err);
+
+          const row = rows[0];
+          if (!row) return resolve(undefined);
+
+          resolve(row.status);
+        }
+      );
+    });
+  }
+
+  async upsertProjectStatus(projectId: string, status: "OPEN" | "CLOSED"): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.pool.query(
+        `INSERT INTO project_status_view (project_id, status)
+         VALUES (?, ?)
+         ON DUPLICATE KEY UPDATE status = VALUES(status)`,
+        [projectId, status],
+        (err) => (err ? reject(err) : resolve())
+      );
     });
   }
 
   async teardown(): Promise<void> {
-    return new Promise((resolve, reject) => this.pool.end((err) => (err ? reject(err) : resolve())));
+    return new Promise((resolve, reject) =>
+      this.pool.end((err) => (err ? reject(err) : resolve()))
+    );
   }
 }
