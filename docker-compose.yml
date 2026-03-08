@@ -44,12 +44,29 @@ services:
     ports:
       - "3002:3002"
 
+  projects:
+    build: ./services/projects
+    environment:
+      PORT: 3003
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DB: project_db
+      RABBIT_URL: amqp://rabbitmq:5672
+      RABBIT_EXCHANGE: domain-events
+    depends_on:
+      - mysql
+      - rabbitmq
+    ports:
+      - "3003:3003"
+
   gateway:
     build: ./gateway
     environment:
       PORT: 3000
       AUTH_URL: http://auth:3001
       TASKS_URL: http://tasks:3002
+      PROJECTS_URL: http://projects:3003
       SESSION_SECRET: change-me
     depends_on:
       - auth
