@@ -85,5 +85,18 @@ services:
       - ./frontend:/app
       - /app/node_modules
 
+  notifications:
+    build: ./services/notifications
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DB: notification_db
+      RABBIT_URL: amqp://rabbitmq:5672
+      RABBIT_EXCHANGE: domain-events
+    depends_on:
+      - mysql
+      - rabbitmq
+
 volumes:
   mysql_data:
