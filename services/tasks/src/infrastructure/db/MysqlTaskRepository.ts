@@ -1,6 +1,6 @@
 import mysql from "mysql2";
 import type { Pool } from "mysql2";
-import type { TaskRepository, Task } from "../../domain/TaskRepository";
+import type { TaskRepository, Task, ProjectView } from "../../domain/TaskRepository";
 
 export class MysqlTaskRepository implements TaskRepository {
   private pool!: Pool;
@@ -89,10 +89,10 @@ export class MysqlTaskRepository implements TaskRepository {
     });
   }
 
-    async getProjectStatus(projectId: string): Promise<"OPEN" | "CLOSED" | undefined> {
+  async getProjectView(projectId: string): Promise<ProjectView | undefined> {
     return new Promise((resolve, reject) => {
       this.pool.query(
-        "SELECT status FROM project_status_view WHERE project_id=?",
+        "SELECT project_id, project_name, status FROM project_status_view WHERE project_id=?",
         [projectId],
         (err, rows: any[]) => {
           if (err) return reject(err);
@@ -100,19 +100,25 @@ export class MysqlTaskRepository implements TaskRepository {
           const row = rows[0];
           if (!row) return resolve(undefined);
 
-          resolve(row.status);
+          resolve({
+            projectId: row.project_id,
+            projectName: row.project_name,
+            status: row.status,
+          });
         }
       );
     });
   }
 
-  async upsertProjectStatus(projectId: string, status: "OPEN" | "CLOSED"): Promise<void> {
+  async upsertProjectView(projectId: string, projectName: string | null, status: "OPEN" | "CLOSED"): Promise<void> {
     return new Promise((resolve, reject) => {
       this.pool.query(
-        `INSERT INTO project_status_view (project_id, status)
-         VALUES (?, ?)
-         ON DUPLICATE KEY UPDATE status = VALUES(status)`,
-        [projectId, status],
+        `INSERT INTO project_status_view (project_id, project_name, status)
+         VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+           project_name = VALUES(project_name),
+           status = VALUES(status)`,
+        [projectId, projectName, status],
         (err) => (err ? reject(err) : resolve())
       );
     });

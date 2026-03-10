@@ -38,7 +38,11 @@ export function buildProjectRoutes(repo: ProjectRepository, bus: RabbitPublisher
     };
 
     await repo.storeProject(project);
-    await bus.publish("project.created", { projectId: project.id, userId });
+  await bus.publish("project.created", {
+    projectId: project.id,
+    projectName: project.name,
+    userId,
+  });
 
     res.json(project);
   });
@@ -60,7 +64,11 @@ export function buildProjectRoutes(repo: ProjectRepository, bus: RabbitPublisher
     };
 
     await repo.updateProject(existing.id, updated, userId);
-    await bus.publish("project.updated", { projectId: existing.id, userId });
+    await bus.publish("project.updated", {
+      projectId: existing.id,
+      projectName: updated.name,
+      userId,
+    });
 
     res.json(updated);
   });
@@ -83,8 +91,11 @@ export function buildProjectRoutes(repo: ProjectRepository, bus: RabbitPublisher
     };
 
     await repo.updateProject(project.id, updated, userId);
-    await bus.publish("project.closed", { projectId: project.id, userId });
-
+    await bus.publish("project.closed", {
+      projectId: project.id,
+      projectName: project.name,
+      userId,
+    });
     res.json(updated);
   });
 

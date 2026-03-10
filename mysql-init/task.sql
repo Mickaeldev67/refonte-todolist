@@ -15,5 +15,6 @@ CREATE TABLE IF NOT EXISTS tasks (
 
 CREATE TABLE IF NOT EXISTS project_status_view (
   project_id VARCHAR(36) PRIMARY KEY,
+  project_name VARCHAR(255) NULL,
   status VARCHAR(32) NOT NULL
 );

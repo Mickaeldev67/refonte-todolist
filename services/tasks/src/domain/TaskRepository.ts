@@ -8,6 +8,12 @@ export type Task = {
   projectId: string;
 };
 
+export type ProjectView = {
+  projectId: string;
+  projectName: string | null;
+  status: "OPEN" | "CLOSED"
+};
+
 export interface TaskRepository {
   getTasks(userId: string): Promise<Task[]>;
   getTask(id: string, userId: string): Promise<Task | undefined>;
@@ -15,8 +21,8 @@ export interface TaskRepository {
   updateTask(id: string, task: Task, userId: string): Promise<void>;
   removeTask(id: string, userId: string): Promise<void>;
 
-  getProjectStatus(projectId: string): Promise<ProjectStatus | undefined>;
-  upsertProjectStatus(projectId: string, status: ProjectStatus): Promise<void>;
+  getProjectView(projectId: string): Promise<ProjectView | undefined>;
+  upsertProjectView(projectId: string, projectName: string | null, status: ProjectStatus): Promise<void>;
 
   teardown(): Promise<void>;
 }
