@@ -21,6 +21,7 @@ export class RabbitConsumer {
         const q = await channel.assertQueue("", { exclusive: true });
 
         await channel.bindQueue(q.queue, exchange, "project.created");
+        await channel.bindQueue(q.queue, exchange, "project.updated");
         await channel.bindQueue(q.queue, exchange, "project.closed");
 
         await channel.consume(q.queue, async (msg) => {
@@ -31,11 +32,31 @@ export class RabbitConsumer {
             const payload = JSON.parse(msg.content.toString());
 
             if (routingKey === "project.created") {
-              await this.repo.upsertProjectStatus(payload.projectId, "OPEN");
+              await this.repo.upsertProjectView(
+                payload.projectId,
+                payload.projectName ?? null,
+                "OPEN"
+              );
+            }
+
+            if (routingKey === "project.updated") {
+              const existing = await this.repo.getProjectView(payload.projectId);
+
+              await this.repo.upsertProjectView(
+                payload.projectId,
+                payload.projectName ?? existing?.projectName ?? null,
+                existing?.status ?? "OPEN"
+              );
             }
 
             if (routingKey === "project.closed") {
-              await this.repo.upsertProjectStatus(payload.projectId, "CLOSED");
+              const existing = await this.repo.getProjectView(payload.projectId);
+
+              await this.repo.upsertProjectView(
+                payload.projectId,
+                payload.projectName ?? existing?.projectName ?? null,
+                "CLOSED"
+              );
             }
 
             channel.ack(msg);

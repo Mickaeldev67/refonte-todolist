@@ -86,14 +86,13 @@ export function buildTaskRoutes(repo: TaskRepository, bus: RabbitPublisher) {
       return res.status(400).json({ error: "Task already open" });
     }
 
-    const projectStatus = await repo.getProjectStatus(t.projectId);
+    const projectView = await repo.getProjectView(t.projectId);
 
-    // si la projection n'est pas encore là, nous la refusons dans le doute pour ne pas la rouvrir à tort
-    if (!projectStatus) {
+    if (!projectView) {
       return res.status(400).json({ error: "Unknown project status" });
     }
 
-    if (projectStatus === "CLOSED") {
+    if (projectView.status === "CLOSED") {
       return res.status(400).json({ error: "Cannot reopen task because project is closed" });
     }
 
@@ -104,6 +103,7 @@ export function buildTaskRoutes(repo: TaskRepository, bus: RabbitPublisher) {
       await bus.publish("task.reopened", {
         taskId: t.id,
         projectId: t.projectId,
+        projectName: projectView.projectName,
         userId,
         status: t.status,
       });
