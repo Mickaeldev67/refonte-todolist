@@ -18,4 +18,30 @@ test.describe('TodoList App', () => {
 
     await expect(page.getByText(projectName)).toBeVisible();
   });
+
+  test('Création d’une tâche sur un projet', async ({ page }) => {
+    const projectName = `Projet Tâches E2E ${Date.now()}`;
+    const taskName = `Tâche E2E ${Date.now()}`;
+
+    await page.goto('http://localhost:5173');
+
+    await page.getByPlaceholder('Username').fill('test');
+    await page.getByPlaceholder('Password').fill('test');
+    await page.getByRole('button', { name: 'Login' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Projects' })).toBeVisible();
+
+    await page.getByPlaceholder('Nom du projet').fill(projectName);
+    await page.getByPlaceholder('Description').fill('Projet pour test de création de tâche');
+    await page.getByRole('button', { name: 'Créer le projet' }).click();
+
+    await expect(page.getByText(projectName)).toBeVisible();
+
+    await page.getByText(projectName).first().click();
+
+    await page.getByPlaceholder('New task').fill(taskName);
+    await page.getByRole('button', { name: 'Ajouter' }).click();
+
+    await expect(page.getByText(`${taskName} (OPEN)`)).toBeVisible();
+  });
 });
