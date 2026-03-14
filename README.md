@@ -49,13 +49,16 @@ nvm use 24.13.1
 ---
 # Pour les développeurs 
 
-Lancer les tests backend, dans le dossier backend ouvrir un terminal et tapez : 
-
+Lancer les tests backend, dans le dossier **backend** ouvrir un terminal et tapez : 
 npm run test 
 
-Lancer les tests frontend, dans le dossier frontend ouvrir un terminal et tapez : 
+Lancer les tests frontend, dans le dossier **frontend** ouvrir un terminal et tapez : 
 
 npx playwright test
+1. Création d’un projet
+2. Création d’une tâche sur le projet
+3. Marquer la tâche comme terminée
+4. Vérifier la présence de la notification dans les logs
 
 # 🚀 Lancer le projet en développement
 
@@ -91,3 +94,6 @@ Les décisions d’architecture sont documentées dans le dossier `/adr`.
 - ADR-002 : Choix du mécanisme de hachage
 - ADR-003 : Choix du mécanisme d’authentification
 - ADR-004 : Choix de l’outil de tests E2E
+- ADR-005 : Choix de du message broker
+- ADR-006 : Choix du nombre de base de données
+- ADR-007 : Choix du langage backend
