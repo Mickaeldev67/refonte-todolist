@@ -156,3 +156,69 @@ test('POST /tasks/:id/close marquer la tâche comme terminée', async () => {
     }),
   );
 });
+
+test('POST /projects/:id/close clôture le projet quand toutes les tâches sont terminées', async () => {
+  const repo = {
+    getProjects: jest.fn(),
+    getProject: jest.fn().mockResolvedValue({
+      id: 'project-1',
+      userId: 'user-1',
+      name: 'Projet A',
+      description: null,
+      status: 'OPEN',
+      closedAt: null,
+      openTasksCount: 0,
+      closedTasksCount: 3,
+    }),
+    storeProject: jest.fn(),
+    updateProject: jest.fn().mockResolvedValue(undefined),
+    removeProject: jest.fn(),
+    incrementOpenTasks: jest.fn(),
+    closeTask: jest.fn(),
+    reopenTask: jest.fn(),
+    deleteTask: jest.fn(),
+    teardown: jest.fn(),
+  };
+  const bus = { publish: jest.fn().mockResolvedValue(undefined) };
+
+  const router = buildProjectRoutes(repo as any, bus as any);
+  const closeLayer = (router as any).stack.find(
+    (l: any) => l.route?.path === '/projects/:id/close' && l.route.methods.post,
+  );
+  const handler = closeLayer.route.stack[0].handle;
+
+  const req = {
+    header: (k: string) => (k === 'X-User-Id' ? 'user-1' : ''),
+    params: { id: 'project-1' },
+  } as any;
+  const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
+
+  await handler(req, res);
+
+  expect(repo.getProject).toHaveBeenCalledWith('project-1', 'user-1');
+  expect(repo.updateProject).toHaveBeenCalledWith(
+    'project-1',
+    expect.objectContaining({
+      id: 'project-1',
+      status: 'CLOSED',
+      closedAt: expect.any(String),
+      openTasksCount: 0,
+    }),
+    'user-1',
+  );
+  expect(bus.publish).toHaveBeenCalledWith(
+    'project.closed',
+    expect.objectContaining({
+      projectId: 'project-1',
+      projectName: 'Projet A',
+      userId: 'user-1',
+    }),
+  );
+  expect(res.json).toHaveBeenCalledWith(
+    expect.objectContaining({
+      id: 'project-1',
+      status: 'CLOSED',
+      closedAt: expect.any(String),
+    }),
+  );
+});
