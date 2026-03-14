@@ -97,3 +97,62 @@ test('POST /tasks crée une tâche sur un projet', async () => {
     }),
   );
 });
+
+test('POST /tasks/:id/close marquer la tâche comme terminée', async () => {
+  const repo = {
+    getTasks: jest.fn(),
+    getTask: jest.fn().mockResolvedValue({
+      id: 'task-1',
+      name: 'Tâche A',
+      status: 'OPEN',
+      projectId: 'project-1',
+    }),
+    storeTask: jest.fn(),
+    updateTask: jest.fn().mockResolvedValue(undefined),
+    removeTask: jest.fn(),
+    getProjectView: jest.fn(),
+    upsertProjectView: jest.fn(),
+    teardown: jest.fn(),
+  };
+  const bus = { publish: jest.fn().mockResolvedValue(undefined) };
+
+  const router = buildTaskRoutes(repo as any, bus as any);
+  const closeLayer = (router as any).stack.find(
+    (l: any) => l.route?.path === '/tasks/:id/close' && l.route.methods.post,
+  );
+  const handler = closeLayer.route.stack[0].handle;
+
+  const req = {
+    header: (k: string) => (k === 'X-User-Id' ? 'user-1' : ''),
+    params: { id: 'task-1' },
+  } as any;
+  const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
+
+  await handler(req, res);
+
+  expect(repo.getTask).toHaveBeenCalledWith('task-1', 'user-1');
+  expect(repo.updateTask).toHaveBeenCalledWith(
+    'task-1',
+    expect.objectContaining({
+      id: 'task-1',
+      status: 'CLOSED',
+      projectId: 'project-1',
+    }),
+    'user-1',
+  );
+  expect(bus.publish).toHaveBeenCalledWith(
+    'task.closed',
+    expect.objectContaining({
+      taskId: 'task-1',
+      projectId: 'project-1',
+      userId: 'user-1',
+      status: 'CLOSED',
+    }),
+  );
+  expect(res.json).toHaveBeenCalledWith(
+    expect.objectContaining({
+      id: 'task-1',
+      status: 'CLOSED',
+    }),
+  );
+});
