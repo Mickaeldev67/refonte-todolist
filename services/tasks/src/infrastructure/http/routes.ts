@@ -3,25 +3,18 @@ import { v4 as uuid } from "uuid";
 import type { TaskRepository } from "../../domain/TaskRepository";
 import type { RabbitPublisher } from "../messaging/RabbitPublisher";
 
-export function buildTaskRoutes(repo: TaskRepository, bus: RabbitPublisher) {
-  const r = express.Router();
-  const getUserId = (req: express.Request) => req.header("X-User-Id") || "";
-
-  r.get("/tasks", async (req, res) => {
-    const userId = getUserId(req);
-    if (!userId) return res.status(401).json({ error: "Not authenticated" });
-
-    const tasks = await repo.getTasks(userId);
-    res.json(tasks);
-  });
-
-  r.post("/tasks", async (req, res) => {
-    const userId = getUserId(req);
-    if (!userId) return res.status(401).json({ error: "Not authenticated" });
+export function buildCreateTaskHandler(repo: TaskRepository, bus: RabbitPublisher) {
+  return async (req: express.Request, res: express.Response): Promise<void> => {
+    const userId = req.header("X-User-Id") || "";
+    if (!userId) {
+      res.status(401).json({ error: "Not authenticated" });
+      return;
+    }
 
     const { name, projectId } = req.body ?? {};
     if (!name || !projectId) {
-      return res.status(400).json({ error: "Missing fields" });
+      res.status(400).json({ error: "Missing fields" });
+      return;
     }
 
     const task = {
@@ -45,7 +38,22 @@ export function buildTaskRoutes(repo: TaskRepository, bus: RabbitPublisher) {
     }
 
     res.json(task);
+  };
+}
+
+export function buildTaskRoutes(repo: TaskRepository, bus: RabbitPublisher) {
+  const r = express.Router();
+  const getUserId = (req: express.Request) => req.header("X-User-Id") || "";
+
+  r.get("/tasks", async (req, res) => {
+    const userId = getUserId(req);
+    if (!userId) return res.status(401).json({ error: "Not authenticated" });
+
+    const tasks = await repo.getTasks(userId);
+    res.json(tasks);
   });
+
+  r.post("/tasks", buildCreateTaskHandler(repo, bus));
 
   r.post("/tasks/:id/close", async (req, res) => {
     const userId = getUserId(req);
