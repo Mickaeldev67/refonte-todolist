@@ -1,3 +1,25 @@
+# Comment lancer le projet 
+1. Cloner le repo suivant : https://github.com/Mickaeldev67/refonte-todolist.git
+2. Faites "cd refonte-todolist" pour entrer dans le projet. 
+3. Faite npm install dans : 
+   3.a Le dossier racine
+   3.b services/auth
+   3.c services/notifications
+   3.d services/projects
+   3.e services/projects 
+4. Ensuite pour lancer le projet lancer l'application docker puis tapez les commandes suivantes à la racine du projet : docker-compose up --build
+5. Vous pouvez ensuite lancer les différents tests : 
+   5.a. backend workflow : allez dans à la racine du projet et tapez : npm run test. 
+   5.b. Tasks : allez dans le dossier **services/tasks** et tapez : npm run test
+   5.b. Frontend : dans le dossier **frontend** ouvrir un terminal et tapez : 
+   npx playwright test
+
+Les différents tests : 
+1. Création d’un projet
+2. Création d’une tâche sur le projet
+3. Marquer la tâche comme terminée
+4. Vérifier la présence de la notification dans les logs
+
 # Refonte – Getting Started Application
 
 Ce projet est une refonte de l'application  :
@@ -47,18 +69,6 @@ nvm install --lts
 nvm use 24.13.1
 
 ---
-# Pour les développeurs 
-
-Lancer les tests backend, dans le dossier **backend** ouvrir un terminal et tapez : 
-npm run test 
-
-Lancer les tests frontend, dans le dossier **frontend** ouvrir un terminal et tapez : 
-
-npx playwright test
-1. Création d’un projet
-2. Création d’une tâche sur le projet
-3. Marquer la tâche comme terminée
-4. Vérifier la présence de la notification dans les logs
 
 # 🚀 Lancer le projet en développement
 
