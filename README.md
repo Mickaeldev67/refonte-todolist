@@ -15,6 +15,8 @@
    5.b. Frontend : dans le dossier **frontend** ouvrir un terminal et tapez : 
    npx playwright test
 
+   ATTENTION ! pour jouer les tests frontend, assurez-vous d'avoir au préalable inscrit un utilisateur avec username "test" et password "test"
+
 Les différents tests : 
 1. Création d’un projet
 2. Création d’une tâche sur le projet
