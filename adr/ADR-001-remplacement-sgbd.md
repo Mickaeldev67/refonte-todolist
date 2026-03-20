@@ -1,6 +1,6 @@
 # ADR N°1 — Remplacement du système de gestion de base de données
 
-**Statut :** Appliqué  
+**Statut :** Annulé 
 
 ---
 

@@ -12,10 +12,9 @@
 5. Vous pouvez ensuite lancer les différents tests : 
    5.a. backend workflow : allez dans à la racine du projet et tapez : npm run test. 
    5.b. Tasks : allez dans le dossier **services/tasks** et tapez : npm run test
+   ATTENTION ! pour jouer les tests frontend, assurez-vous d'avoir au préalable inscrit un utilisateur avec username "test" et password "test"
    5.b. Frontend : dans le dossier **frontend** ouvrir un terminal et tapez : 
    npx playwright test
-
-   ATTENTION ! pour jouer les tests frontend, assurez-vous d'avoir au préalable inscrit un utilisateur avec username "test" et password "test"
 
 Les différents tests : 
 1. Création d’un projet
@@ -165,3 +164,4 @@ Les décisions d’architecture sont documentées dans le dossier `/adr`.
 - ADR-005 : Choix de du message broker
 - ADR-006 : Choix du nombre de base de données
 - ADR-007 : Choix du langage backend
+- ADR-008 : Choix de réimplémenter Sqlite 
