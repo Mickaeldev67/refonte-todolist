@@ -127,18 +127,9 @@ nvm use 24.13.1
 
 ---
 
-# 🚀 Lancer le projet en développement
-
-Lancer, à la raçine du projet : 
-docker-compose up --build
-
-Accès aux services :
+# 🚀 Accès aux services frontend 
 
    Frontend : http://localhost:5173
-
-   Backend API : http://localhost:3000
-
-   MySQL : localhost:3306
 
 ---
 
